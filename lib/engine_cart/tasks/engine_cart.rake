@@ -29,9 +29,7 @@ namespace :engine_cart do
           "_#{Gem.loaded_specs["rails"].version}_"
         end
 
-        Bundler.with_clean_env do
-          `rails #{version} new internal --skip-spring #{EngineCart.rails_options} #{"-m #{EngineCart.template}" if EngineCart.template}`
-        end
+        `rails #{version} new internal --skip-spring #{EngineCart.rails_options} #{"-m #{EngineCart.template}" if EngineCart.template}`
 
         unless $?
           raise "Error generating new rails app. Aborting."
@@ -50,7 +48,11 @@ namespace :engine_cart do
 
       f.write <<-EOF
         gem '#{EngineCart.current_engine_name}', :path => '#{File.expand_path('.')}'
-EOF
+
+        if File.exists?("#{gemfile_extras_path}")
+          eval File.read("#{gemfile_extras_path}"), nil, "#{gemfile_extras_path}"
+        end
+      EOF
     end
   end
 
